@@ -10,7 +10,7 @@ Plateforme EdTech qui évalue le score de cybersécurité professionnel d'un uti
 Score gratuit → Formation payante → Certification LinkedIn
 ```
 
-Le score est l'appât gratuit. La formation est le produit payant. La certification est la raison d'acheter.
+Le score est gratuit. La formation est le produit payant. La certification est la raison d'acheter.
 
 ## ⚡ Stack technique
 
