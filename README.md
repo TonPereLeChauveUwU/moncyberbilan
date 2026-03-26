@@ -43,36 +43,3 @@ Le score est gratuit. La formation est le produit payant. La certification est l
 4. **Sécurité des postes & réseaux** — Antivirus, VPN, pare-feu, mises à jour
 5. **Cybersécurité & Finance** — Sécurité bancaire, crypto, arnaques financières
 
-## 🚀 Démarrage rapide
-
-```bash
-# Cloner le repo
-git clone https://github.com/TonPereLeChauveUwU/moncyberbilan.git
-cd moncyberbilan
-
-# Installer les dépendances
-npm install
-
-# Lancer en développement
-npm run dev
-```
-
-Le serveur démarre sur `http://localhost:5000`.
-
-## 📈 Roadmap
-
-- [ ] Intégration Stripe pour les paiements
-- [ ] Séquence email post-quiz (SendGrid)
-- [ ] Modules de formation vidéo
-- [ ] Badge Credly automatisé
-- [ ] Blog SEO intégré
-- [ ] Pack entreprise (dashboard multi-utilisateurs)
-- [ ] Certification Qualiopi / CPF
-
-## 📄 Licence
-
-MIT
-
----
-
-*Projet développé dans le cadre d'une startup EdTech en cybersécurité.*
