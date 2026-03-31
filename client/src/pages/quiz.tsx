@@ -56,10 +56,20 @@ const levelConfig = {
 
 export default function Quiz() {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [answers, setAnswers] = useState<Record<string, number>>({}); // questionId -> option index
   const [showResults, setShowResults] = useState(false);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+
+  // Convert selected option indices to score values for calculation
+  const getScoreAnswers = (): Record<string, number> => {
+    const scores: Record<string, number> = {};
+    for (const [qId, optIndex] of Object.entries(answers)) {
+      const q = quizQuestions.find((qq) => qq.id === qId);
+      if (q) scores[qId] = q.options[optIndex].value;
+    }
+    return scores;
+  };
 
   const question = quizQuestions[currentIndex];
   const progress = ((currentIndex + (answers[question?.id] !== undefined ? 1 : 0)) / quizQuestions.length) * 100;
@@ -68,15 +78,15 @@ export default function Quiz() {
 
   const result = useMemo(() => {
     if (!showResults) return null;
-    return calculateResult(answers);
+    return calculateResult(getScoreAnswers());
   }, [showResults, answers]);
 
-  const handleAnswer = (value: number) => {
-    const newAnswers = { ...answers, [question.id]: value };
+  const handleAnswer = (optionIndex: number) => {
+    const newAnswers = { ...answers, [question.id]: optionIndex };
     setAnswers(newAnswers);
 
     if (currentIndex < quizQuestions.length - 1) {
-      setTimeout(() => setCurrentIndex(currentIndex + 1), 200);
+      setTimeout(() => setCurrentIndex(currentIndex + 1), 250);
     } else {
       setTimeout(() => setShowResults(true), 300);
     }
@@ -90,7 +100,10 @@ export default function Quiz() {
         email,
         score: result.score,
         level: result.level,
-        answers: JSON.stringify(answers),
+        answers: JSON.stringify(getScoreAnswers()),
+        percentage: result.percentage,
+        themeScores: result.themeScores,
+        recommendations: result.recommendations,
         createdAt: new Date().toISOString(),
       });
       setSubmitted(true);
@@ -251,11 +264,11 @@ export default function Quiz() {
 
         <div className="space-y-3">
           {question.options.map((opt, idx) => {
-            const isSelected = answers[question.id] === opt.value;
+            const isSelected = answers[question.id] === idx;
             return (
               <button
                 key={idx}
-                onClick={() => handleAnswer(opt.value)}
+                onClick={() => handleAnswer(idx)}
                 className={`w-full text-left p-4 rounded-lg border transition-all text-sm leading-relaxed ${
                   isSelected
                     ? "border-primary bg-primary/10 text-foreground"
