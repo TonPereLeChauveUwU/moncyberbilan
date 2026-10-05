@@ -19,7 +19,7 @@ export default function Information({ kind }: { kind: "privacy" | "legal" | "con
     </div> : kind === "legal" ? <div className="space-y-4 text-sm leading-relaxed">
       <p>Nom du projet : {publisher.brand}.</p>
       {publisher.legalName && <p>Éditeur : {publisher.legalName}.</p>}
-      {publisher.publicAddress && <p>Adresse : {publisher.publicAddress}.</p>}
+      {publisher.publicAddress ? <p>Adresse : {publisher.publicAddress}.</p> : <p>Ville : {publisher.city}. Adresse postale complète à préciser.</p>}
       {publisher.registration && <p>Immatriculation : {publisher.registration}.</p>}
       {!publisher.legalName && <p>Les informations d'identification de l'éditeur sont en cours de finalisation.</p>}
       <p>Le site est hébergé par Vercel. Le bilan est une auto-évaluation déclarative : il ne constitue ni un audit technique ni une certification.</p>
@@ -30,3 +30,4 @@ export default function Information({ kind }: { kind: "privacy" | "legal" | "con
     </div>}
   </main>;
 }
+
