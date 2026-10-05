@@ -15,3 +15,10 @@ test("session restores valid results but rejects corrupt, expired and incomplete
   assert.deepEqual(loadQuizSession(storage), { answers: {}, currentIndex: 0, showResults: false });
   assert.equal(saveQuizSession({ setItem: () => { throw new Error("disabled"); } }, { answers, currentIndex: 0, showResults: false }), false);
 });
+
+test("old option indices are discarded when the questionnaire version changes", () => {
+  let value: string | null = JSON.stringify({version: 1, savedAt: Date.now(), answers, currentIndex: 29, showResults: true});
+  const storage = {getItem: () => value, removeItem: () => { value = null; }};
+  assert.deepEqual(loadQuizSession(storage), {answers: {}, currentIndex: 0, showResults: false});
+  assert.equal(value, null);
+});

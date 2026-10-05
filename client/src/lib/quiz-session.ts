@@ -6,7 +6,7 @@ const KEY = "cyberbilan.quiz.v1";
 const MAX_AGE = 24 * 60 * 60 * 1000;
 export type QuizSession = { answers: Answers; currentIndex: number; showResults: boolean };
 const schema = z.object({
-  version: z.literal(1), savedAt: z.number().finite(), answers: answersSchema,
+  version: z.literal(2), savedAt: z.number().finite(), answers: answersSchema,
   currentIndex: z.number().int().min(0).max(quizQuestions.length - 1), showResults: z.boolean(),
 });
 export const emptySession = (): QuizSession => ({ answers: {}, currentIndex: 0, showResults: false });
@@ -23,6 +23,6 @@ export function loadQuizSession(storage: Pick<Storage, "getItem" | "removeItem">
   }
 }
 export function saveQuizSession(storage: Pick<Storage, "setItem">, session: QuizSession): boolean {
-  try { storage.setItem(KEY, JSON.stringify({ ...session, version: 1, savedAt: Date.now() })); return true; }
+  try { storage.setItem(KEY, JSON.stringify({ ...session, version: 2, savedAt: Date.now() })); return true; }
   catch { return false; }
 }
