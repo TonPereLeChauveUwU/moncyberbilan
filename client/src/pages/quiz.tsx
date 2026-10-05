@@ -43,7 +43,7 @@ export default function Quiz() {
   if (showResults && result) {
     const cfg = levelConfig[result.level];
     return (
-      <div className="min-h-screen bg-background">
+      <div className="quiz-shell min-h-screen">
         <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
             <Button asChild variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="button-back-home"><Link href="/">
@@ -55,13 +55,13 @@ export default function Quiz() {
           </div>
         </header>
 
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+        <div className="results-body mx-auto px-4 sm:px-6">
           {/* Score card */}
-          <Card className={`border ${cfg.border} ${cfg.bg} mb-6`}>
+          <Card className={`score-card border ${cfg.border} mb-6`}>
             <CardContent className="p-6 text-center">
               <div className="text-3xl mb-2">{cfg.emoji}</div>
               <h1 ref={headingRef} tabIndex={-1} className="text-sm font-medium text-muted-foreground mb-1">Votre score de cybersécurité</h1>
-              <div className={`text-4xl font-bold ${cfg.color} mb-1`}>{result.percentage}%</div>
+              <div className={`score-value ${cfg.color} mb-1`}>{result.percentage}%</div>
               <div className={`text-sm font-semibold ${cfg.color}`}>Niveau : {cfg.label}</div>
               <div className="text-xs text-muted-foreground mt-2">
                 {result.score} / {result.maxScore} points
@@ -132,7 +132,7 @@ export default function Quiz() {
 
   // Quiz view
   return (
-    <div className="min-h-screen bg-background">
+    <div className="quiz-shell min-h-screen">
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
           <Button asChild variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="button-back-quiz"><Link href="/">
@@ -148,7 +148,7 @@ export default function Quiz() {
         </div>
       </header>
 
-      <div className="max-w-xl mx-auto px-4 sm:px-6 py-10">
+      <div className="quiz-body mx-auto px-4 sm:px-6 pb-16">
         {/* Theme indicator */}
         <div className="flex flex-wrap items-center gap-2 mb-6">
           <span className="text-base">{question.themeIcon}</span>
@@ -169,14 +169,15 @@ export default function Quiz() {
                 type="button"
                 aria-pressed={isSelected}
                 onClick={() => setAnswers((previous) => ({ ...previous, [question.id]: idx }))}
-                className={`w-full text-left p-4 rounded-lg border transition-all text-sm leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
+                className={`answer-option w-full text-left border leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                   isSelected
                     ? "border-primary bg-primary/10 text-foreground"
                     : "border-border/60 bg-card hover:border-primary/30 hover:bg-card/80 text-foreground"
                 }`}
                 data-testid={`option-${idx}`}
               >
-                {opt.label}
+                <span className="answer-letter" aria-hidden="true">{isSelected ? "✓" : String.fromCharCode(65 + idx)}</span>
+                <span>{opt.label}</span>
               </button>
             );
           })}

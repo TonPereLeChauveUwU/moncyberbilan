@@ -1,194 +1,60 @@
 import { Link } from "wouter";
-import { Shield, ChevronRight, Lock, Brain, Database, Wifi, Banknote, Award, Users, ArrowRight } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ShieldCheck, LockKeyhole, Fingerprint, Database, Monitor, Landmark, Check, Clock3, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { PerplexityAttribution } from "@/components/PerplexityAttribution";
 
 const themes = [
-  { icon: Lock, title: "Mots de passe", desc: "Authentification & gestion des accès" },
-  { icon: Brain, title: "Phishing", desc: "Ingénierie sociale & arnaques" },
-  { icon: Database, title: "Données & RGPD", desc: "Protection & conformité" },
-  { icon: Wifi, title: "Postes & Réseaux", desc: "Infrastructure & sécurité réseau" },
-  { icon: Banknote, title: "Finance", desc: "Sécurité des comptes & transactions" },
-];
-
-const stats = [
-  { value: "30", label: "Questions sur vos pratiques" },
-  { value: "5", label: "Thèmes de cybersécurité" },
-  { value: "Gratuit", label: "Score et conseils" },
-  { value: "Sans compte", label: "Résultats immédiats" },
+  { icon: Fingerprint, title: "Vos accès", desc: "Mots de passe et authentification", detail: "Les bons réflexes pour garder le contrôle de vos comptes." },
+  { icon: ShieldCheck, title: "Les arnaques", desc: "Phishing et ingénierie sociale", detail: "Reconnaître les pièges avant de cliquer ou de répondre." },
+  { icon: Database, title: "Vos données", desc: "Protection et confidentialité", detail: "Sauvegarder, partager et protéger ce qui compte." },
+  { icon: Monitor, title: "Vos appareils", desc: "Postes et réseaux", detail: "Faire le point sur la sécurité de votre environnement." },
+  { icon: Landmark, title: "Vos finances", desc: "Comptes et transactions", detail: "Sécuriser vos paiements et repérer les demandes suspectes." },
 ];
 
 export default function Home() {
-  return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-md">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" aria-label="MonCyberBilan logo">
-              <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2" className="text-primary" />
-              <path d="M16 8 L16 14 M12 11 L16 14 L20 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
-              <rect x="10" y="15" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="2" className="text-primary" />
-              <circle cx="16" cy="19.5" r="1.5" fill="currentColor" className="text-primary" />
-              <path d="M16 21 L16 22.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" className="text-primary" />
-            </svg>
-            <span className="font-semibold text-sm tracking-tight">MonCyberBilan</span>
-          </div>
-          <nav className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
-            <Link href="/quiz" className="hover:text-foreground">Diagnostic</Link>
-            <Link href="/confidentialite" className="hover:text-foreground">Confidentialité</Link>
-            <Link href="/contact" className="hover:text-foreground">Contact</Link>
-          </nav>
-          <Button asChild size="sm" className="gap-1.5 text-sm" data-testid="button-start-quiz-header"><Link href="/quiz">
-              Évaluer mon score
-              <ChevronRight className="w-3.5 h-3.5" />
-            </Link></Button>
+  return <div className="home-page">
+    <a href="#contenu" className="skip-link">Aller au contenu</a>
+    <header className="site-header">
+      <div className="site-container header-inner">
+        <Link href="/" className="brand"><span className="brand-icon"><ShieldCheck aria-hidden="true" /></span><span>mon<span className="text-primary">cyber</span>bilan<span className="brand-dot">.</span></span></Link>
+        <nav aria-label="Navigation principale" className="desktop-nav"><a href="#methode">La méthode</a><Link href="/confidentialite">Confidentialité</Link><Link href="/contact">Contact</Link></nav>
+        <Button asChild className="header-cta" data-testid="button-start-quiz-header"><Link href="/quiz">Faire le bilan <ArrowUpRight /></Link></Button>
+      </div>
+    </header>
+    <main id="contenu">
+      <section className="site-container hero-section">
+        <div className="hero-copy">
+          <p className="eyebrow"><span className="status-dot" /> VOTRE SÉCURITÉ NUMÉRIQUE, EN CLAIR</p>
+          <h1>Les bons réflexes.<br />Les bons déclics.<br /><span className="text-primary">Votre cyberbilan.</span></h1>
+          <p className="hero-description">Faites le point sur vos habitudes numériques. Découvrez vos points forts et les actions qui feront la différence.</p>
+          <Button asChild size="lg" className="hero-cta" data-testid="button-start-quiz-hero"><Link href="/quiz">Commencer mon bilan <ArrowUpRight /></Link></Button>
+          <div className="hero-reassurance"><span><Clock3 /> Environ 5 minutes</span><span><Check /> Gratuit, sans compte</span></div>
         </div>
-      </header>
-
-      <main>
-      {/* Hero */}
-      <section className="pt-28 pb-16 sm:pt-36 sm:pb-24 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-medium mb-6" data-testid="badge-free">
-            <Shield className="w-3.5 h-3.5" />
-            Évaluation gratuite en 5 minutes
-          </div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight leading-tight mb-4 text-foreground">
-            Quel est votre score de cybersécurité ?
-          </h1>
-          <p className="text-base text-muted-foreground leading-relaxed max-w-xl mx-auto mb-8">
-            30 questions, 5 thèmes, un diagnostic personnalisé de vos pratiques de sécurité numérique. Identifiez vos failles et corrigez-les avant qu'il ne soit trop tard.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Button asChild size="lg" className="gap-2 px-6 text-sm font-medium w-full sm:w-auto" data-testid="button-start-quiz-hero"><Link href="/quiz">
-                Commencer le diagnostic
-                <ArrowRight className="w-4 h-4" />
-              </Link></Button>
-            <Button variant="outline" size="lg" className="gap-2 px-6 text-sm font-medium" disabled data-testid="button-formation">
-              <Award className="w-4 h-4" />
-              Voir la formation
-              <span className="text-xs text-muted-foreground">(bientôt)</span>
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats bar */}
-      <section className="border-y border-border/50 bg-card/50 py-8 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-6">
-          {stats.map((s) => (
-            <div key={s.label} className="text-center">
-              <div className="text-lg font-bold text-primary">{s.value}</div>
-              <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+        <div className="preview-scene">
+          <div className="preview-orbit" aria-hidden="true" />
+          <div className="report-preview">
+            <div className="preview-heading"><span><span className="status-dot" /> VOTRE VUE D’ENSEMBLE</span><span className="sample-label">Exemple de bilan</span></div>
+            <div className="preview-score"><div className="score-orbit"><div><strong>72<span>%</span></strong><small>Score illustratif</small></div></div><div><span className="level-pill">De bonnes bases</span><h2>Comprendre.<br />Puis progresser.</h2><p>Un score. Cinq thèmes.<br />Des conseils concrets.</p></div></div>
+            <div className="preview-bars" aria-label="Exemples de scores par thème">
+              {([['Accès & mots de passe', 83], ['Protection des données', 67], ['Sécurité des appareils', 72]] as const).map(([label, value]) => <div key={label}><div><span>{label}</span><span>{value}%</span></div><div className="preview-track"><span style={{ width: `${value}%` }} /></div></div>)}
             </div>
-          ))}
+            <div className="preview-action"><span className="mini-icon"><LockKeyhole /></span><div><strong>Votre prochaine action</strong><p>Activer la double authentification</p></div><ArrowUpRight aria-hidden="true" /></div>
+          </div>
+          <div className="privacy-note"><ShieldCheck /><span>Vos réponses restent<br /><strong>dans votre navigateur.</strong></span></div>
         </div>
       </section>
-
-      {/* 5 themes */}
-      <section className="py-16 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-lg font-bold text-center mb-2">5 thèmes évalués</h2>
-          <p className="text-sm text-muted-foreground text-center mb-8 max-w-md mx-auto">
-            Chaque thème contient 6 questions couvrant les pratiques essentielles de cybersécurité.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-            {themes.map((t) => (
-              <Card key={t.title} className="group border border-border/60 bg-card hover:border-primary/30 transition-colors">
-                <CardContent className="p-4 text-center">
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center mx-auto mb-3 group-hover:bg-primary/15 transition-colors">
-                    <t.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <h3 className="text-sm font-semibold mb-1">{t.title}</h3>
-                  <p className="text-xs text-muted-foreground">{t.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
+      <div className="site-container fact-strip"><div><strong>30</strong><span>questions concrètes</span></div><div><strong>5</strong><span>thèmes essentiels</span></div><div><strong>0</strong><span>email à donner</span></div><a href="#methode">Découvrez la méthode <ChevronDown /></a></div>
+      <section id="methode" className="site-container content-section">
+        <div className="section-heading"><div><p className="eyebrow">01 / LE DIAGNOSTIC</p><h2>Votre quotidien numérique.<br /><span className="muted-title">Sous tous les angles.</span></h2></div><p>Pas besoin d’être expert. Répondez selon vos habitudes : le bilan vous aide à identifier vos priorités.</p></div>
+        <div className="theme-grid">{themes.map((theme, i) => <article className="theme-tile" key={theme.title}><div className="tile-top"><theme.icon aria-hidden="true" /><span>0{i + 1}</span></div><h3>{theme.title}</h3><p className="theme-subtitle">{theme.desc}</p><p>{theme.detail}</p><span className="question-count">6 questions</span></article>)}</div>
       </section>
-
-      {/* How it works */}
-      <section className="py-16 px-4 sm:px-6 bg-card/30 border-y border-border/30">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-lg font-bold text-center mb-8">Comment ça marche</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            {[
-              { step: "01", title: "Répondez au quiz", desc: "30 questions sur vos pratiques de cybersécurité professionnelle. 5 minutes." },
-              { step: "02", title: "Obtenez votre score", desc: "Un score global + détail par thème avec des recommandations personnalisées." },
-              { step: "03", title: "Corrigez vos failles", desc: "Commencez par les actions proposées dans votre bilan. Une formation est en préparation." },
-            ].map((item) => (
-              <div key={item.step} className="flex flex-col items-center text-center">
-                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold mb-3">
-                  {item.step}
-                </div>
-                <h3 className="text-sm font-semibold mb-1.5">{item.title}</h3>
-                <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Target audiences */}
-      <section className="py-16 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-lg font-bold text-center mb-8">Pour qui ?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {[
-              { icon: Users, title: "Salariés & Freelances", price: "Diagnostic gratuit", desc: "Identifiez les pratiques à améliorer dans votre quotidien numérique." },
-              { icon: Shield, title: "PME & Managers", price: "Auto-évaluation", desc: "Repérez les sujets à approfondir avec votre équipe informatique." },
-              { icon: Award, title: "Formation", price: "En préparation", desc: "Les modalités seront présentées lors du lancement. Aucune formation ni certification n’est proposée à la vente actuellement." },
-            ].map((item) => (
-              <Card key={item.title} className="border border-border/60 bg-card">
-                <CardContent className="p-5">
-                  <item.icon className="w-5 h-5 text-primary mb-3" />
-                  <h3 className="text-sm font-semibold mb-1">{item.title}</h3>
-                  <div className="text-xs text-primary font-medium mb-2">{item.price}</div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-16 px-4 sm:px-6 bg-primary/5 border-t border-border/30">
-        <div className="max-w-2xl mx-auto text-center">
-          <h2 className="text-lg font-bold mb-3">Prêt à évaluer votre cybersécurité ?</h2>
-          <p className="text-sm text-muted-foreground mb-6">
-            Le diagnostic est gratuit et accessible sans compte. Vos réponses restent dans votre navigateur. Le bilan s'affiche directement, sans adresse email à fournir.
-          </p>
-          <Button asChild size="lg" className="gap-2 px-8 text-sm font-medium" data-testid="button-start-quiz-cta"><Link href="/quiz">
-              Lancer le diagnostic
-              <ArrowRight className="w-4 h-4" />
-            </Link></Button>
-        </div>
-      </section>
-
-      </main>
-      {/* Footer */}
-      <footer className="border-t border-border/50 py-8 px-4 sm:px-6">
-        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <svg width="20" height="20" viewBox="0 0 32 32" fill="none" aria-label="MonCyberBilan">
-              <rect x="2" y="2" width="28" height="28" rx="6" stroke="currentColor" strokeWidth="2" className="text-primary" />
-              <path d="M16 8 L16 14 M12 11 L16 14 L20 11" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" />
-              <rect x="10" y="15" width="12" height="9" rx="2" stroke="currentColor" strokeWidth="2" className="text-primary" />
-            </svg>
-            <span>MonCyberBilan.app &copy; 2026</span>
-          </div>
-          <div className="flex flex-wrap justify-center items-center gap-4">
-            <Link href="/mentions-legales" className="underline">Mentions légales</Link>
-            <Link href="/confidentialite" className="underline">Politique de confidentialité</Link>
-            <Link href="/contact" className="underline">Contact</Link>
-          </div>
-          <PerplexityAttribution />
-        </div>
-      </footer>
-    </div>
-  );
+      <section className="method-section"><div className="site-container content-section"><div className="section-heading"><div><p className="eyebrow">02 / LA SUITE</p><h2>Du constat à l’action.<br /><span className="muted-title">En trois étapes.</span></h2></div><p>Un moment pour faire le point.<br />Des habitudes à garder longtemps.</p></div><div className="steps-grid">{[
+        ['01','Observez vos habitudes','Répondez aux 30 questions à votre rythme. Vous pouvez revenir sur chaque réponse.'],
+        ['02','Découvrez votre profil','Un score global et un détail par thème pour repérer vos points forts et vos axes de progrès.'],
+        ['03','Passez à l’action','Commencez par les recommandations de votre bilan, à votre rythme.'],
+      ].map(([number,title,description]) => <article key={number}><span className="step-number">{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>
+      <section className="site-container content-section"><div className="closing-panel"><div><p className="eyebrow">LE PREMIER PAS EST SIMPLE</p><h2>Reprenez la main sur<br />votre sécurité numérique.</h2><p>Gratuit. Sans compte. Sans adresse email à fournir.</p></div><Button asChild size="lg" className="hero-cta" data-testid="button-start-quiz-cta"><Link href="/quiz">C’est parti <ArrowRight /></Link></Button><ShieldCheck className="closing-symbol" aria-hidden="true" /></div><p className="assessment-note">Une auto-évaluation de vos pratiques, pas un audit technique ni une certification. La formation est en préparation.</p></section>
+    </main>
+    <footer className="site-container site-footer"><div><Link href="/" className="footer-brand">moncyberbilan.</Link><p>Les bons réflexes commencent ici.</p><small>© {new Date().getFullYear()} CyberBilan</small></div><nav aria-label="Informations"><Link href="/mentions-legales">Mentions légales</Link><Link href="/confidentialite">Confidentialité</Link><Link href="/contact">Contact</Link></nav><PerplexityAttribution /></footer>
+  </div>;
 }

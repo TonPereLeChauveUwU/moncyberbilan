@@ -3,7 +3,7 @@ import { publisher } from "@/config/publisher";
 
 export default function Information({ kind }: { kind: "privacy" | "legal" | "contact" }) {
   const title = kind === "privacy" ? "Confidentialité" : kind === "legal" ? "Mentions légales" : "Contact";
-  return <main className="max-w-2xl mx-auto px-4 py-10 space-y-6">
+  return <main className="information-page max-w-2xl mx-auto space-y-6">
     <Link href="/" className="text-primary underline">Retour à l'accueil</Link>
     <h1 className="text-2xl font-bold">{title}</h1>
     {kind === "privacy" ? <div className="space-y-5 text-sm leading-relaxed">
