@@ -13,10 +13,10 @@ const themes = [
 ];
 
 const stats = [
-  { value: "6,2 Mds€", label: "Marché cyber FR d'ici 2028" },
-  { value: "49%", label: "Hausse des offres d'emploi cyber" },
-  { value: "36%", label: "Maturité cyber du secteur public" },
-  { value: "30", label: "Questions d'évaluation" },
+  { value: "30", label: "Questions sur vos pratiques" },
+  { value: "5", label: "Thèmes de cybersécurité" },
+  { value: "Gratuit", label: "Score et conseils" },
+  { value: "Sans compte", label: "Résultats immédiats" },
 ];
 
 export default function Home() {
@@ -36,19 +36,18 @@ export default function Home() {
             <span className="font-semibold text-sm tracking-tight">MonCyberBilan</span>
           </div>
           <nav className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
-            <span className="cursor-default">Score</span>
-            <span className="cursor-default">Formation</span>
-            <span className="cursor-default">Certification</span>
+            <Link href="/quiz" className="hover:text-foreground">Diagnostic</Link>
+            <Link href="/confidentialite" className="hover:text-foreground">Confidentialité</Link>
+            <Link href="/contact" className="hover:text-foreground">Contact</Link>
           </nav>
-          <Link href="/quiz">
-            <Button size="sm" className="gap-1.5 text-sm" data-testid="button-start-quiz-header">
+          <Button asChild size="sm" className="gap-1.5 text-sm" data-testid="button-start-quiz-header"><Link href="/quiz">
               Évaluer mon score
               <ChevronRight className="w-3.5 h-3.5" />
-            </Button>
-          </Link>
+            </Link></Button>
         </div>
       </header>
 
+      <main>
       {/* Hero */}
       <section className="pt-28 pb-16 sm:pt-36 sm:pb-24 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
@@ -63,12 +62,10 @@ export default function Home() {
             30 questions, 5 thèmes, un diagnostic personnalisé de vos pratiques de sécurité numérique. Identifiez vos failles et corrigez-les avant qu'il ne soit trop tard.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/quiz">
-              <Button size="lg" className="gap-2 px-6 text-sm font-medium w-full sm:w-auto" data-testid="button-start-quiz-hero">
+            <Button asChild size="lg" className="gap-2 px-6 text-sm font-medium w-full sm:w-auto" data-testid="button-start-quiz-hero"><Link href="/quiz">
                 Commencer le diagnostic
                 <ArrowRight className="w-4 h-4" />
-              </Button>
-            </Link>
+              </Link></Button>
             <Button variant="outline" size="lg" className="gap-2 px-6 text-sm font-medium" disabled data-testid="button-formation">
               <Award className="w-4 h-4" />
               Voir la formation
@@ -121,7 +118,7 @@ export default function Home() {
             {[
               { step: "01", title: "Répondez au quiz", desc: "30 questions sur vos pratiques de cybersécurité professionnelle. 5 minutes." },
               { step: "02", title: "Obtenez votre score", desc: "Un score global + détail par thème avec des recommandations personnalisées." },
-              { step: "03", title: "Corrigez vos failles", desc: "Suivez la formation certifiée pour atteindre le niveau excellent." },
+              { step: "03", title: "Corrigez vos failles", desc: "Commencez par les actions proposées dans votre bilan. Une formation est en préparation." },
             ].map((item) => (
               <div key={item.step} className="flex flex-col items-center text-center">
                 <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold mb-3">
@@ -141,9 +138,9 @@ export default function Home() {
           <h2 className="text-lg font-bold text-center mb-8">Pour qui ?</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[
-              { icon: Users, title: "Salariés & Freelances", price: "Gratuit → 49€", desc: "Évaluez vos pratiques et montez en compétence avec la formation essentielle." },
-              { icon: Shield, title: "PME & Managers", price: "149€ / personne", desc: "Formation pro avec badge numérique LinkedIn pour vos équipes." },
-              { icon: Award, title: "Entreprises (10+)", price: "990€ / pack", desc: "Pack entreprise avec dashboard de suivi et rapport de conformité." },
+              { icon: Users, title: "Salariés & Freelances", price: "Diagnostic gratuit", desc: "Identifiez les pratiques à améliorer dans votre quotidien numérique." },
+              { icon: Shield, title: "PME & Managers", price: "Auto-évaluation", desc: "Repérez les sujets à approfondir avec votre équipe informatique." },
+              { icon: Award, title: "Formation", price: "En préparation", desc: "Les modalités seront présentées lors du lancement. Aucune formation ni certification n’est proposée à la vente actuellement." },
             ].map((item) => (
               <Card key={item.title} className="border border-border/60 bg-card">
                 <CardContent className="p-5">
@@ -163,17 +160,16 @@ export default function Home() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-lg font-bold mb-3">Prêt à évaluer votre cybersécurité ?</h2>
           <p className="text-sm text-muted-foreground mb-6">
-            Le diagnostic est gratuit, anonyme et prend 5 minutes. Vos résultats restent confidentiels.
+            Le diagnostic est gratuit et accessible sans compte. Vos réponses restent dans votre navigateur, sauf si vous demandez l'envoi du rapport par email.
           </p>
-          <Link href="/quiz">
-            <Button size="lg" className="gap-2 px-8 text-sm font-medium" data-testid="button-start-quiz-cta">
+          <Button asChild size="lg" className="gap-2 px-8 text-sm font-medium" data-testid="button-start-quiz-cta"><Link href="/quiz">
               Lancer le diagnostic
               <ArrowRight className="w-4 h-4" />
-            </Button>
-          </Link>
+            </Link></Button>
         </div>
       </section>
 
+      </main>
       {/* Footer */}
       <footer className="border-t border-border/50 py-8 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-muted-foreground">
@@ -185,10 +181,10 @@ export default function Home() {
             </svg>
             <span>MonCyberBilan.app &copy; 2026</span>
           </div>
-          <div className="flex items-center gap-4">
-            <span>Mentions légales</span>
-            <span>Politique de confidentialité</span>
-            <span>Contact</span>
+          <div className="flex flex-wrap justify-center items-center gap-4">
+            <Link href="/mentions-legales" className="underline">Mentions légales</Link>
+            <Link href="/confidentialite" className="underline">Politique de confidentialité</Link>
+            <Link href="/contact" className="underline">Contact</Link>
           </div>
           <PerplexityAttribution />
         </div>

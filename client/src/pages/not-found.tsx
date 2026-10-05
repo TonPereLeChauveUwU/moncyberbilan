@@ -8,12 +8,10 @@ export default function NotFound() {
       <div className="text-center px-4">
         <h1 className="text-4xl font-bold text-muted-foreground mb-2">404</h1>
         <p className="text-sm text-muted-foreground mb-6">Page introuvable</p>
-        <Link href="/">
-          <Button variant="outline" size="sm" className="gap-1.5 text-sm">
+        <Button asChild variant="outline" size="sm" className="gap-1.5 text-sm"><Link href="/">
             <ArrowLeft className="w-3.5 h-3.5" />
             Retour à l'accueil
-          </Button>
-        </Link>
+          </Link></Button>
       </div>
     </div>
   );

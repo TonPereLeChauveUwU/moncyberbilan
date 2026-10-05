@@ -1,50 +1,13 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef, type FormEvent } from "react";
 import { Link } from "wouter";
-import { quizQuestions, themes } from "@/data/questions";
+import { quizQuestions, themes } from "@shared/questions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, CheckCircle2, Shield } from "lucide-react";
-import type { QuizResult, ThemeScore } from "@shared/schema";
-
-function calculateResult(answers: Record<string, number>): QuizResult {
-  const maxScore = quizQuestions.length * 3;
-  const totalScore = Object.values(answers).reduce((sum, v) => sum + v, 0);
-  const percentage = Math.round((totalScore / maxScore) * 100);
-
-  const themeScores: ThemeScore[] = themes.map((theme, idx) => {
-    const themeQuestions = quizQuestions.filter((q) => q.theme === theme);
-    const themeMax = themeQuestions.length * 3;
-    const themeTotal = themeQuestions.reduce((sum, q) => sum + (answers[q.id] || 0), 0);
-    const icons = ["🔐", "🎣", "🛡️", "💻", "💰"];
-    return {
-      theme,
-      themeIcon: icons[idx] || "📊",
-      score: themeTotal,
-      maxScore: themeMax,
-      percentage: Math.round((themeTotal / themeMax) * 100),
-    };
-  });
-
-  let level: QuizResult["level"];
-  if (percentage >= 85) level = "excellent";
-  else if (percentage >= 70) level = "bon";
-  else if (percentage >= 50) level = "moyen";
-  else if (percentage >= 30) level = "faible";
-  else level = "critique";
-
-  const recommendations: string[] = [];
-  themeScores.forEach((ts) => {
-    if (ts.percentage < 50) {
-      recommendations.push(`Priorité : améliorer votre score en "${ts.theme}" (${ts.percentage}%)`);
-    }
-  });
-  if (recommendations.length === 0) {
-    recommendations.push("Bon niveau global. Continuez à maintenir vos bonnes pratiques.");
-  }
-
-  return { score: totalScore, maxScore, percentage, level, themeScores, recommendations };
-}
+import { calculateResult, type Answers } from "@shared/quiz";
+import { loadQuizSession, saveQuizSession, emptySession } from "@/lib/quiz-session";
+import { sendReport } from "@/lib/send-report";
 
 const levelConfig = {
   critique: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/30", label: "Critique", emoji: "🔴" },
@@ -55,61 +18,46 @@ const levelConfig = {
 };
 
 export default function Quiz() {
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [answers, setAnswers] = useState<Record<string, number>>({}); // questionId -> option index
-  const [showResults, setShowResults] = useState(false);
+  const [initial] = useState(() => {
+    try { return loadQuizSession(sessionStorage); } catch { return emptySession(); }
+  });
+  const [currentIndex, setCurrentIndex] = useState(initial.currentIndex);
+  const [answers, setAnswers] = useState<Answers>(initial.answers);
+  const [showResults, setShowResults] = useState(initial.showResults);
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [saved, setSaved] = useState(true);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const sendingRef = useRef(false);
 
-  // Convert selected option indices to score values for calculation
-  const getScoreAnswers = (): Record<string, number> => {
-    const scores: Record<string, number> = {};
-    for (const [qId, optIndex] of Object.entries(answers)) {
-      const q = quizQuestions.find((qq) => qq.id === qId);
-      if (q) scores[qId] = q.options[optIndex].value;
-    }
-    return scores;
-  };
+  useEffect(() => {
+    try { setSaved(saveQuizSession(sessionStorage, { answers, currentIndex, showResults })); }
+    catch { setSaved(false); }
+  }, [answers, currentIndex, showResults]);
+  useEffect(() => { headingRef.current?.focus(); }, [currentIndex, showResults]);
 
   const question = quizQuestions[currentIndex];
-  const progress = ((currentIndex + (answers[question?.id] !== undefined ? 1 : 0)) / quizQuestions.length) * 100;
-  const currentTheme = question?.theme;
-  const currentThemeIndex = themes.indexOf(currentTheme);
-
-  const result = useMemo(() => {
-    if (!showResults) return null;
-    return calculateResult(getScoreAnswers());
-  }, [showResults, answers]);
-
-  const handleAnswer = (optionIndex: number) => {
-    const newAnswers = { ...answers, [question.id]: optionIndex };
-    setAnswers(newAnswers);
-
-    if (currentIndex < quizQuestions.length - 1) {
-      setTimeout(() => setCurrentIndex(currentIndex + 1), 250);
-    } else {
-      setTimeout(() => setShowResults(true), 300);
-    }
+  const progress = Object.keys(answers).length / quizQuestions.length * 100;
+  const currentThemeIndex = themes.indexOf(question.theme);
+  const result = useMemo(() => showResults ? calculateResult(answers) : null, [showResults, answers]);
+  const resetQuiz = () => {
+    setAnswers({}); setCurrentIndex(0); setShowResults(false);
+    setSubmitted(false); setEmail(""); setError("");
   };
-
-  const handleSubmitEmail = async () => {
-    if (!result || !email) return;
+  const handleSubmitEmail = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!result || sendingRef.current) return;
+    sendingRef.current = true;
+    setSending(true); setError("");
     try {
-      const { apiRequest } = await import("@/lib/queryClient");
-      await apiRequest("POST", "/api/leads", {
-        email,
-        score: result.score,
-        level: result.level,
-        answers: JSON.stringify(getScoreAnswers()),
-        percentage: result.percentage,
-        themeScores: result.themeScores,
-        recommendations: result.recommendations,
-        createdAt: new Date().toISOString(),
-      });
+      await sendReport(email.trim(), answers);
       setSubmitted(true);
-    } catch {
-      setSubmitted(true); // Still show success UX
-    }
+    } catch (err) {
+      setError(err instanceof Error && err.name !== "TimeoutError" && err.name !== "TypeError"
+        ? err.message : "L'envoi n'a pas pu être confirmé. Vérifiez votre connexion et réessayez plus tard.");
+    } finally { sendingRef.current = false; setSending(false); }
   };
 
   // Results view
@@ -119,12 +67,10 @@ export default function Quiz() {
       <div className="min-h-screen bg-background">
         <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
           <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="button-back-home">
+            <Button asChild variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="button-back-home"><Link href="/">
                 <ArrowLeft className="w-3.5 h-3.5" />
                 Accueil
-              </Button>
-            </Link>
+              </Link></Button>
             <div className="flex-1" />
             <span className="text-xs text-muted-foreground">Résultats</span>
           </div>
@@ -135,7 +81,7 @@ export default function Quiz() {
           <Card className={`border ${cfg.border} ${cfg.bg} mb-6`}>
             <CardContent className="p-6 text-center">
               <div className="text-3xl mb-2">{cfg.emoji}</div>
-              <div className="text-sm font-medium text-muted-foreground mb-1">Votre score de cybersécurité</div>
+              <h1 ref={headingRef} tabIndex={-1} className="text-sm font-medium text-muted-foreground mb-1">Votre score de cybersécurité</h1>
               <div className={`text-4xl font-bold ${cfg.color} mb-1`}>{result.percentage}%</div>
               <div className={`text-sm font-semibold ${cfg.color}`}>Niveau : {cfg.label}</div>
               <div className="text-xs text-muted-foreground mt-2">
@@ -145,7 +91,7 @@ export default function Quiz() {
           </Card>
 
           {/* Theme breakdown */}
-          <h3 className="text-sm font-semibold mb-3">Détail par thème</h3>
+          <h2 className="text-sm font-semibold mb-3">Détail par thème</h2>
           <div className="space-y-3 mb-6">
             {result.themeScores.map((ts) => {
               const tsLevel = ts.percentage >= 70 ? "bon" : ts.percentage >= 50 ? "moyen" : ts.percentage >= 30 ? "faible" : "critique";
@@ -153,14 +99,14 @@ export default function Quiz() {
               return (
                 <Card key={ts.theme} className="border border-border/60">
                   <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center justify-between gap-3 mb-2">
                       <div className="flex items-center gap-2">
                         <span className="text-base">{ts.themeIcon}</span>
                         <span className="text-sm font-medium">{ts.theme}</span>
                       </div>
                       <span className={`text-sm font-bold ${tsCfg.color}`}>{ts.percentage}%</span>
                     </div>
-                    <Progress value={ts.percentage} className="h-2" />
+                    <Progress value={ts.percentage} aria-label={ts.theme} className="h-2" />
                   </CardContent>
                 </Card>
               );
@@ -168,7 +114,7 @@ export default function Quiz() {
           </div>
 
           {/* Recommendations */}
-          <h3 className="text-sm font-semibold mb-3">Recommandations</h3>
+          <h2 className="text-sm font-semibold mb-3">Recommandations</h2>
           <Card className="border border-border/60 mb-6">
             <CardContent className="p-4 space-y-2">
               {result.recommendations.map((r, i) => (
@@ -186,39 +132,50 @@ export default function Quiz() {
               <CardContent className="p-5">
                 <h3 className="text-sm font-semibold mb-1.5">Recevez votre rapport détaillé</h3>
                 <p className="text-xs text-muted-foreground mb-4">
-                  Entrez votre email pour recevoir votre bilan complet avec des conseils personnalisés et découvrir notre formation certifiée.
+                  Votre email sert uniquement à vous envoyer ce bilan. Aucun abonnement à des messages commerciaux.
                 </p>
-                <div className="flex gap-2">
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="votre@email.com"
-                    className="flex-1 px-3 py-2 text-sm border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary/30"
-                    data-testid="input-email"
-                  />
-                  <Button onClick={handleSubmitEmail} disabled={!email.includes("@")} className="text-sm" data-testid="button-submit-email">
-                    Envoyer
-                  </Button>
-                </div>
+                <form onSubmit={handleSubmitEmail} aria-busy={sending}>
+                  <label htmlFor="report-email" className="block text-sm mb-2">Votre adresse email</label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input id="report-email" type="email" name="email" required maxLength={254}
+                      autoComplete="email" value={email} disabled={sending}
+                      onChange={(e) => setEmail(e.target.value)} placeholder="votre@email.com"
+                      aria-describedby="report-privacy"
+                      className="min-w-0 w-full flex-1 px-3 py-2 text-sm border border-border rounded-md bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
+                      data-testid="input-email" />
+                    <Button type="submit" disabled={sending || !email.trim()} data-testid="button-submit-email">
+                      {sending ? "Envoi en cours…" : "Envoyer"}
+                    </Button>
+                  </div>
+                  <p id="report-privacy" className="text-xs text-muted-foreground mt-3">
+                    Votre adresse et vos réponses sont transmises pour préparer le rapport.
+                    {" "}<Link href="/confidentialite" className="underline">Utilisation de vos données</Link>
+                  </p>
+                  {error && <p role="alert" className="text-sm text-red-400 mt-3">{error}</p>}
+                </form>
               </CardContent>
             </Card>
           ) : (
-            <Card className="border border-emerald-500/30 bg-emerald-500/5">
+            <Card role="status" className="border border-emerald-500/30 bg-emerald-500/5">
               <CardContent className="p-5 text-center">
                 <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
                 <h3 className="text-sm font-semibold mb-1">Merci !</h3>
                 <p className="text-xs text-muted-foreground">
-                  Votre rapport sera envoyé à {email}. Nous vous contacterons dès que la formation sera disponible.
+                  Votre rapport a été accepté par le service d'envoi pour {email}. Vérifiez aussi vos courriers indésirables.
                 </p>
               </CardContent>
             </Card>
           )}
 
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button variant="outline" disabled={sending} onClick={() => { setShowResults(false); setSubmitted(false); setError(""); }}>Revoir mes réponses</Button>
+            <Button variant="ghost" onClick={resetQuiz} disabled={sending}>Effacer et recommencer</Button>
+          </div>
+          {!saved && <p role="status" className="mt-3 text-sm">La reprise est indisponible dans ce navigateur. Gardez cette page ouverte.</p>}
           {/* CTA formation */}
           <div className="mt-6 text-center">
             <p className="text-xs text-muted-foreground mb-3">
-              Envie de passer au niveau supérieur ? Notre formation certifiée couvre chaque thème en profondeur.
+              Ce bilan est une auto-évaluation de vos pratiques, pas un audit technique ni une certification. La formation est en préparation.
             </p>
             <Button variant="outline" size="sm" className="text-xs gap-1.5" disabled data-testid="button-formation-cta">
               <Shield className="w-3.5 h-3.5" />
@@ -235,14 +192,12 @@ export default function Quiz() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center gap-3">
-          <Link href="/">
-            <Button variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="button-back-quiz">
+          <Button asChild variant="ghost" size="sm" className="gap-1.5 text-xs" data-testid="button-back-quiz"><Link href="/">
               <ArrowLeft className="w-3.5 h-3.5" />
               Quitter
-            </Button>
-          </Link>
+            </Link></Button>
           <div className="flex-1">
-            <Progress value={progress} className="h-1.5" />
+            <Progress value={progress} aria-label="Questions répondues" className="h-1.5" />
           </div>
           <span className="text-xs text-muted-foreground tabular-nums">
             {currentIndex + 1}/{quizQuestions.length}
@@ -252,24 +207,26 @@ export default function Quiz() {
 
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-10">
         {/* Theme indicator */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex flex-wrap items-center gap-2 mb-6">
           <span className="text-base">{question.themeIcon}</span>
           <span className="text-xs font-medium text-primary">{question.theme}</span>
           <span className="text-xs text-muted-foreground">— Thème {currentThemeIndex + 1}/5</span>
         </div>
 
-        <h2 className="text-base sm:text-lg font-semibold mb-6 leading-relaxed" data-testid="text-question">
+        <h1 ref={headingRef} tabIndex={-1} id="quiz-question" className="text-base sm:text-lg font-semibold mb-6 leading-relaxed" data-testid="text-question">
           {question.question}
-        </h2>
+        </h1>
 
-        <div className="space-y-3">
+        <div className="space-y-3" role="group" aria-labelledby="quiz-question">
           {question.options.map((opt, idx) => {
             const isSelected = answers[question.id] === idx;
             return (
               <button
                 key={idx}
-                onClick={() => handleAnswer(idx)}
-                className={`w-full text-left p-4 rounded-lg border transition-all text-sm leading-relaxed ${
+                type="button"
+                aria-pressed={isSelected}
+                onClick={() => setAnswers((previous) => ({ ...previous, [question.id]: idx }))}
+                className={`w-full text-left p-4 rounded-lg border transition-all text-sm leading-relaxed focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${
                   isSelected
                     ? "border-primary bg-primary/10 text-foreground"
                     : "border-border/60 bg-card hover:border-primary/30 hover:bg-card/80 text-foreground"
@@ -282,6 +239,9 @@ export default function Quiz() {
           })}
         </div>
 
+        <p className="mt-4 text-xs text-muted-foreground" role="status">
+          {saved ? "Votre progression est conservée dans cet onglet, pendant 24 heures maximum." : "La reprise est indisponible dans ce navigateur. Gardez cette page ouverte."}
+        </p>
         {/* Nav buttons */}
         <div className="flex items-center justify-between mt-8">
           <Button
@@ -295,18 +255,12 @@ export default function Quiz() {
             <ArrowLeft className="w-3.5 h-3.5" />
             Précédent
           </Button>
-          {answers[question.id] !== undefined && currentIndex < quizQuestions.length - 1 && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCurrentIndex(currentIndex + 1)}
-              className="text-xs gap-1"
-              data-testid="button-next"
-            >
-              Suivant
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Button>
-          )}
+          <Button size="sm" disabled={answers[question.id] === undefined}
+            onClick={() => currentIndex < quizQuestions.length - 1 ? setCurrentIndex(currentIndex + 1) : setShowResults(true)}
+            className="text-xs gap-1" data-testid="button-next">
+            {currentIndex < quizQuestions.length - 1 ? "Suivant" : "Voir mon bilan"}
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Button>
         </div>
       </div>
     </div>

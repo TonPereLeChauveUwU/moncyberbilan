@@ -4,3 +4,7 @@ sqlite.db
 .env
 *.log
 .vercel
+
+.env.*
+!.env.example
+coverage/

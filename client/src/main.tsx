@@ -2,8 +2,11 @@ import { createRoot } from "react-dom/client";
 import App from "./App";
 import "./index.css";
 
-if (!window.location.hash) {
-  window.location.hash = "#/";
+// Preserve incoming links from the old hash router.
+const legacyRoutes = ["/", "/quiz"];
+const legacyPath = window.location.hash.slice(1);
+if (legacyRoutes.includes(legacyPath)) {
+  window.history.replaceState(null, "", legacyPath);
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
