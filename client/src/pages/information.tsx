@@ -9,13 +9,13 @@ export default function Information({ kind }: { kind: "privacy" | "legal" | "con
     {kind === "privacy" ? <div className="space-y-5 text-sm leading-relaxed">
       <section><h2 className="font-semibold mb-2">Votre questionnaire</h2>
         <p>Vous pouvez consulter votre bilan sans donner votre email. Les réponses restent dans cet onglet du navigateur. Elles permettent de reprendre le questionnaire après un rechargement, pendant 24 heures maximum. Le bouton « Effacer et recommencer » les remplace par un questionnaire vide.</p></section>
-      <section><h2 className="font-semibold mb-2">Recevoir le rapport par email</h2>
-        <p>Si vous demandez un rapport, votre adresse et vos réponses sont envoyées au serveur hébergé chez Vercel pour calculer votre bilan. L'adresse et le rapport sont transmis à SendGrid pour l'envoi. Les réponses ne sont pas enregistrées dans une base de contacts par cette application. Aucun abonnement commercial n'est créé et le suivi des ouvertures et des clics est désactivé.</p></section>
-      <section><h2 className="font-semibold mb-2">Protection contre les abus</h2>
-        <p>Des compteurs temporaires associés à des empreintes de l'adresse email et de l'adresse IP limitent les envois. Ces compteurs expirent au plus tard après 24 heures. Ils ne contiennent ni votre adresse en clair ni vos réponses.</p></section>
-      <section><h2 className="font-semibold mb-2">Prestataires et droits</h2>
-        <p>Les prestataires peuvent conserver des journaux techniques nécessaires au fonctionnement du service. Leurs durées de conservation et les informations sur le responsable du traitement doivent être finalisées avant l'ouverture du service d'envoi.</p>
-        <Link href="/contact" className="text-primary underline">Contacter l'éditeur</Link></section>
+      <section><h2 className="font-semibold mb-2">Aucune collecte pour le bilan</h2>
+        <p>Le calcul du bilan se fait dans votre navigateur. Le questionnaire ne transmet ni vos réponses ni votre score au serveur et ne demande aucune adresse email. Il n'existe pas d'envoi automatique de rapport ni d'inscription commerciale.</p></section>
+      <section><h2 className="font-semibold mb-2">Nous contacter</h2>
+        <p>Le lien de contact ouvre votre application de messagerie. Si vous nous écrivez, votre adresse et le contenu de votre message sont utilisés pour traiter votre demande. Évitez d'envoyer des mots de passe ou des informations sensibles.</p>
+        <a className="text-primary underline" href={`mailto:${publisher.contactEmail}`}>{publisher.contactEmail}</a></section>
+      <section><h2 className="font-semibold mb-2">Hébergement</h2>
+        <p>Vercel héberge le site et peut traiter des données techniques de connexion, notamment l'adresse IP, dans ses journaux de fonctionnement. Les informations relatives à l'éditeur et aux durées de conservation applicables restent à compléter.</p></section>
     </div> : kind === "legal" ? <div className="space-y-4 text-sm leading-relaxed">
       <p>Nom du projet : {publisher.brand}.</p>
       {publisher.legalName && <p>Éditeur : {publisher.legalName}.</p>}

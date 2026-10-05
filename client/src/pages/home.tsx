@@ -160,7 +160,7 @@ export default function Home() {
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="text-lg font-bold mb-3">Prêt à évaluer votre cybersécurité ?</h2>
           <p className="text-sm text-muted-foreground mb-6">
-            Le diagnostic est gratuit et accessible sans compte. Vos réponses restent dans votre navigateur, sauf si vous demandez l'envoi du rapport par email.
+            Le diagnostic est gratuit et accessible sans compte. Vos réponses restent dans votre navigateur. Le bilan s'affiche directement, sans adresse email à fournir.
           </p>
           <Button asChild size="lg" className="gap-2 px-8 text-sm font-medium" data-testid="button-start-quiz-cta"><Link href="/quiz">
               Lancer le diagnostic

@@ -1,7 +1,10 @@
 import type { Express } from "express";
 import type { Server } from "http";
-import reportHandler from "./report-handler";
 
 export function registerRoutes(_server: Server, app: Express) {
-  app.all("/api/leads", reportHandler);
+  // No collection API: also prevent the SPA fallback from answering legacy requests.
+  app.use("/api", (_req, res) => {
+    res.setHeader("Cache-Control", "no-store");
+    res.status(404).json({ error: "Route inexistante." });
+  });
 }

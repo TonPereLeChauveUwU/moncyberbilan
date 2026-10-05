@@ -1,0 +1,20 @@
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { quizQuestions } from "../shared/questions";
+import { calculateResult, completeAnswersSchema } from "../shared/quiz";
+const answers = Object.fromEntries(quizQuestions.map(q => [q.id, 0]));
+test("score totals all themes and gives concrete recommendations", () => {
+  const result = calculateResult(answers);
+  assert.equal(result.score, 90); assert.equal(result.percentage, 100);
+  assert.equal(result.level, "excellent"); assert.equal(result.themeScores.length, 5);
+  assert.ok(result.themeScores.every(theme => theme.score === 18));
+  const weak = calculateResult(Object.fromEntries(quizQuestions.map(q => [q.id, 3])));
+  assert.equal(weak.score, 0); assert.equal(weak.level, "critique");
+  assert.match(weak.recommendations.join(" "), /gestionnaire/);
+});
+test("rejects incomplete, unknown and malformed answers", () => {
+  for (const value of [{}, {...answers, "auth-1": 99}, {...answers, "auth-1": 0.5},
+    {...answers, injected: 0}, JSON.stringify(answers)]) {
+    assert.equal(completeAnswersSchema.safeParse(value).success, false);
+  }
+});

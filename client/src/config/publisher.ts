@@ -1,2 +1,2 @@
-// Only publish details confirmed by the owner; the proposed Gmail address is not verified.
-export const publisher = { brand: "CyberBilan", legalName: "", publicAddress: "", contactEmail: "", registration: "" };
+// Contact address supplied by the owner. Legal identity remains to be completed.
+export const publisher = { brand: "CyberBilan", legalName: "", publicAddress: "", contactEmail: "contact.moncyberbilan@protonmail.com", registration: "" };

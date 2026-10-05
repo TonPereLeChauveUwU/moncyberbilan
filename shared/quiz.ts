@@ -13,13 +13,8 @@ export const answersSchema = z.record(z.number().int().nonnegative()).superRefin
 });
 export const completeAnswersSchema = answersSchema.refine(
   (answers) => quizQuestions.every((q) => Object.hasOwn(answers, q.id)),
-  "Répondez à toutes les questions avant de demander votre rapport.",
+  "Répondez à toutes les questions avant de consulter votre bilan.",
 );
-export const reportRequestSchema = z.object({
-  email: z.string().trim().email().max(254),
-  answers: completeAnswersSchema,
-}).strict();
-
 const actions: Record<string, string> = {
   "auth-1": "Utilisez un gestionnaire de mots de passe et un mot de passe différent pour chaque compte.",
   "auth-2": "Activez la double authentification sur votre messagerie et vos comptes importants.",
@@ -33,7 +28,7 @@ const actions: Record<string, string> = {
   "fin-4": "Confirmez tout nouveau RIB auprès du bénéficiaire par un canal indépendant.",
 };
 
-/** Only option indices are accepted; totals and email text never come from the client. */
+/** Calculate the local self-assessment from validated option indices. */
 export function calculateResult(input: Answers): QuizResult {
   const answers = completeAnswersSchema.parse(input);
   const scoreFor = (id: string) => {

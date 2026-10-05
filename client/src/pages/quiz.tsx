@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef, type FormEvent } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "wouter";
 import { quizQuestions, themes } from "@shared/questions";
 import { Button } from "@/components/ui/button";
@@ -7,7 +7,6 @@ import { Progress } from "@/components/ui/progress";
 import { ArrowLeft, ArrowRight, CheckCircle2, Shield } from "lucide-react";
 import { calculateResult, type Answers } from "@shared/quiz";
 import { loadQuizSession, saveQuizSession, emptySession } from "@/lib/quiz-session";
-import { sendReport } from "@/lib/send-report";
 
 const levelConfig = {
   critique: { color: "text-red-500", bg: "bg-red-500/10", border: "border-red-500/30", label: "Critique", emoji: "🔴" },
@@ -24,13 +23,8 @@ export default function Quiz() {
   const [currentIndex, setCurrentIndex] = useState(initial.currentIndex);
   const [answers, setAnswers] = useState<Answers>(initial.answers);
   const [showResults, setShowResults] = useState(initial.showResults);
-  const [email, setEmail] = useState("");
-  const [submitted, setSubmitted] = useState(false);
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState("");
   const [saved, setSaved] = useState(true);
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const sendingRef = useRef(false);
 
   useEffect(() => {
     try { setSaved(saveQuizSession(sessionStorage, { answers, currentIndex, showResults })); }
@@ -44,22 +38,7 @@ export default function Quiz() {
   const result = useMemo(() => showResults ? calculateResult(answers) : null, [showResults, answers]);
   const resetQuiz = () => {
     setAnswers({}); setCurrentIndex(0); setShowResults(false);
-    setSubmitted(false); setEmail(""); setError("");
   };
-  const handleSubmitEmail = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!result || sendingRef.current) return;
-    sendingRef.current = true;
-    setSending(true); setError("");
-    try {
-      await sendReport(email.trim(), answers);
-      setSubmitted(true);
-    } catch (err) {
-      setError(err instanceof Error && err.name !== "TimeoutError" && err.name !== "TypeError"
-        ? err.message : "L'envoi n'a pas pu être confirmé. Vérifiez votre connexion et réessayez plus tard.");
-    } finally { sendingRef.current = false; setSending(false); }
-  };
-
   // Results view
   if (showResults && result) {
     const cfg = levelConfig[result.level];
@@ -126,50 +105,14 @@ export default function Quiz() {
             </CardContent>
           </Card>
 
-          {/* Email capture */}
-          {!submitted ? (
-            <Card className="border border-primary/30 bg-primary/5">
-              <CardContent className="p-5">
-                <h3 className="text-sm font-semibold mb-1.5">Recevez votre rapport détaillé</h3>
-                <p className="text-xs text-muted-foreground mb-4">
-                  Votre email sert uniquement à vous envoyer ce bilan. Aucun abonnement à des messages commerciaux.
-                </p>
-                <form onSubmit={handleSubmitEmail} aria-busy={sending}>
-                  <label htmlFor="report-email" className="block text-sm mb-2">Votre adresse email</label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <input id="report-email" type="email" name="email" required maxLength={254}
-                      autoComplete="email" value={email} disabled={sending}
-                      onChange={(e) => setEmail(e.target.value)} placeholder="votre@email.com"
-                      aria-describedby="report-privacy"
-                      className="min-w-0 w-full flex-1 px-3 py-2 text-sm border border-border rounded-md bg-background focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary"
-                      data-testid="input-email" />
-                    <Button type="submit" disabled={sending || !email.trim()} data-testid="button-submit-email">
-                      {sending ? "Envoi en cours…" : "Envoyer"}
-                    </Button>
-                  </div>
-                  <p id="report-privacy" className="text-xs text-muted-foreground mt-3">
-                    Votre adresse et vos réponses sont transmises pour préparer le rapport.
-                    {" "}<Link href="/confidentialite" className="underline">Utilisation de vos données</Link>
-                  </p>
-                  {error && <p role="alert" className="text-sm text-red-400 mt-3">{error}</p>}
-                </form>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card role="status" className="border border-emerald-500/30 bg-emerald-500/5">
-              <CardContent className="p-5 text-center">
-                <CheckCircle2 className="w-6 h-6 text-emerald-500 mx-auto mb-2" />
-                <h3 className="text-sm font-semibold mb-1">Merci !</h3>
-                <p className="text-xs text-muted-foreground">
-                  Votre rapport a été accepté par le service d'envoi pour {email}. Vérifiez aussi vos courriers indésirables.
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          <p className="text-sm text-muted-foreground">
+            Votre bilan est disponible ici, sans fournir d'adresse email. Vos réponses restent dans cet onglet.
+            {" "}<Link href="/contact" className="text-primary underline">Nous contacter</Link>
+          </p>
 
           <div className="mt-6 flex flex-wrap gap-3">
-            <Button variant="outline" disabled={sending} onClick={() => { setShowResults(false); setSubmitted(false); setError(""); }}>Revoir mes réponses</Button>
-            <Button variant="ghost" onClick={resetQuiz} disabled={sending}>Effacer et recommencer</Button>
+            <Button variant="outline" onClick={() => setShowResults(false)}>Revoir mes réponses</Button>
+            <Button variant="ghost" onClick={resetQuiz}>Effacer et recommencer</Button>
           </div>
           {!saved && <p role="status" className="mt-3 text-sm">La reprise est indisponible dans ce navigateur. Gardez cette page ouverte.</p>}
           {/* CTA formation */}
