@@ -1,45 +1,36 @@
-# MonCyberBilan.app 🔐
+# CyberBilan
 
-> **Évaluez votre score de cybersécurité en 5 minutes.**
+Auto-évaluation gratuite de pratiques de cybersécurité : 30 questions, 5 thèmes,
+score et recommandations affichés directement dans le navigateur. Ce bilan ne
+constitue ni un audit technique ni une certification. La formation est en préparation.
 
-Plateforme EdTech qui évalue le score de cybersécurité professionnel d'un utilisateur, identifie ses failles et propose une formation certifiée pour les corriger.
+## Fonctionnement
 
-## 🎯 Concept
+Aucun compte, aucune collecte d'adresse email, aucun envoi automatique de bilan.
+Les réponses et résultats restent dans l'onglet (sessionStorage, 24 heures maximum).
+Le contact ouvre la messagerie de l'utilisateur : contact.moncyberbilan@protonmail.com.
+Aucune configuration SendGrid ou Redis ni aucun secret n'est nécessaire au quiz.
+L'ancienne API de contacts est supprimée. Les modules et données SQLite historiques
+restent inutilisés ; aucune base existante n'a été effacée.
 
+## Développement
+
+Node.js 24, React, Vite, Tailwind et shadcn/ui. Vercel sert la version statique ;
+Express permet aussi le développement et l'hébergement local.
+
+```sh
+npm ci
+npm run dev
+npm run check
+npm test
+npm run build
+npm start
 ```
-Score gratuit → Formation payante → Certification LinkedIn
-```
 
-Le score est gratuit. La formation est le produit payant. La certification est la raison d'acheter.
+La CI vérifie les types, les tests et la compilation. Les tests couvrent le calcul,
+la validation des réponses et la reprise de session.
 
-## ⚡ Stack technique
+## Publication
 
-| Composant | Technologie |
-|-----------|------------|
-| Frontend | React + Vite + Tailwind CSS + shadcn/ui |
-| Backend | Express.js + SQLite (Drizzle ORM) |
-| Hébergement | Vercel / DigitalOcean (GitHub Student Pack) |
-| CI/CD | GitHub Actions |
-| Emailing | SendGrid (GitHub Student Pack) |
-| Paiement | Stripe |
-| Analytics | PostHog / Google Analytics |
-| Badges | Credly |
-
-## 📊 Fonctionnalités MVP
-
-- ✅ Landing page avec proposition de valeur
-- ✅ Questionnaire de 30 questions (5 thèmes × 6 questions)
-- ✅ Système de scoring avec résultats personnalisés par thème
-- ✅ Capture d'emails (lead generation)
-- ✅ Backend API pour stockage des leads
-- ✅ Dark theme cybersécurité
-- ✅ Responsive design
-
-## 🔒 5 thèmes évalués
-
-1. **Mots de passe & Authentification** — Gestion des accès, 2FA, gestionnaires
-2. **Phishing & Ingénierie sociale** — Détection d'arnaques, bonnes pratiques
-3. **Protection des données & RGPD** — Chiffrement, sauvegardes, conformité
-4. **Sécurité des postes & réseaux** — Antivirus, VPN, pare-feu, mises à jour
-5. **Cybersécurité & Finance** — Sécurité bancaire, crypto, arnaques financières
-
+Voir [la liste de préparation](docs/PUBLICATION.md). L'adresse de contact est
+renseignée ; l'identité légale et les autres mentions applicables restent à compléter.
