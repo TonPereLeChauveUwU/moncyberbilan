@@ -28,7 +28,7 @@ export default function Home() {
           <h1>Les bons réflexes.<br />Les bons déclics.<br /><span className="text-primary">Votre cyberbilan.</span></h1>
           <p className="hero-description">Faites le point sur vos habitudes numériques. Découvrez vos points forts et les actions qui feront la différence.</p>
           <Button asChild size="lg" className="hero-cta" data-testid="button-start-quiz-hero"><Link href="/quiz">Commencer mon bilan <ArrowUpRight /></Link></Button>
-          <div className="hero-reassurance"><span><Clock3 /> Environ 5 minutes</span><span><Check /> Gratuit, sans compte</span></div>
+          <div className="hero-reassurance"><span><Clock3 /> 3 à 5 minutes</span><span><Check /> Gratuit, sans compte</span></div>
         </div>
         <div className="preview-scene">
           <div className="preview-orbit" aria-hidden="true" />
@@ -43,13 +43,13 @@ export default function Home() {
           <div className="privacy-note"><ShieldCheck /><span>Vos réponses restent<br /><strong>dans votre navigateur.</strong></span></div>
         </div>
       </section>
-      <div className="site-container fact-strip"><div><strong>30</strong><span>questions concrètes</span></div><div><strong>5</strong><span>thèmes essentiels</span></div><div><strong>0</strong><span>email à donner</span></div><a href="#methode">Découvrez la méthode <ChevronDown /></a></div>
+      <div className="site-container fact-strip"><div><strong>30</strong><span>questions maximum, selon votre profil</span></div><div><strong>5</strong><span>thèmes essentiels</span></div><div><strong>0</strong><span>email à donner</span></div><a href="#methode">Découvrez la méthode <ChevronDown /></a></div>
       <section id="methode" className="site-container content-section">
         <div className="section-heading"><div><p className="eyebrow">01 / LE DIAGNOSTIC</p><h2>Votre quotidien numérique.<br /><span className="muted-title">Sous tous les angles.</span></h2></div><p>Pas besoin d’être expert. Répondez selon vos habitudes : le bilan vous aide à identifier vos priorités.</p></div>
-        <div className="theme-grid">{themes.map((theme, i) => <article className="theme-tile" key={theme.title}><div className="tile-top"><theme.icon aria-hidden="true" /><span>0{i + 1}</span></div><h3>{theme.title}</h3><p className="theme-subtitle">{theme.desc}</p><p>{theme.detail}</p><span className="question-count">6 questions</span></article>)}</div>
+        <div className="theme-grid">{themes.map((theme, i) => <article className="theme-tile" key={theme.title}><div className="tile-top"><theme.icon aria-hidden="true" /><span>0{i + 1}</span></div><h3>{theme.title}</h3><p className="theme-subtitle">{theme.desc}</p><p>{theme.detail}</p><span className="question-count">Questions ciblées selon votre profil</span></article>)}</div>
       </section>
       <section className="method-section"><div className="site-container content-section"><div className="section-heading"><div><p className="eyebrow">02 / LA SUITE</p><h2>Du constat à l’action.<br /><span className="muted-title">En trois étapes.</span></h2></div><p>Un moment pour faire le point.<br />Des habitudes à garder longtemps.</p></div><div className="steps-grid">{[
-        ['01','Observez vos habitudes','Répondez aux 30 questions à votre rythme. Vous pouvez revenir sur chaque réponse.'],
+        ['01','Observez vos habitudes','Choisissez votre profil puis répondez aux questions adaptées à votre quotidien. Vous pouvez revenir sur chaque réponse.'],
         ['02','Découvrez votre profil','Un score global et un détail par thème pour repérer vos points forts et vos axes de progrès.'],
         ['03','Passez à l’action','Commencez par les recommandations de votre bilan, à votre rythme.'],
       ].map(([number,title,description]) => <article key={number}><span className="step-number">{number}</span><h3>{title}</h3><p>{description}</p></article>)}</div></div></section>

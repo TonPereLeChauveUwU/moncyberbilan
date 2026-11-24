@@ -32,12 +32,12 @@ export const quizQuestions: QuizQuestion[] = [
     id: "auth-3",
     theme: "Mots de passe & Authentification",
     themeIcon: "🔐",
-    question: "Quelle est la longueur minimale de vos mots de passe ?",
+    question: "Que privilégiez-vous pour vos mots de passe ?",
     options: [
-      { label: "12 à 15 caractères", value: 2 },
-      { label: "Moins de 8 caractères", value: 0 },
-      { label: "16 caractères ou plus avec caractères spéciaux", value: 3 },
-      { label: "8 à 11 caractères", value: 1 },
+      { label: "Des mots de passe longs et uniques que je mémorise", value: 2 },
+      { label: "Je réutilise souvent le même mot de passe", value: 0 },
+      { label: "Un gestionnaire génère des mots de passe longs et uniques", value: 3 },
+      { label: "Des mots de passe uniques, mais plutôt courts", value: 1 },
     ],
   },
   {
@@ -56,12 +56,12 @@ export const quizQuestions: QuizQuestion[] = [
     id: "auth-5",
     theme: "Mots de passe & Authentification",
     themeIcon: "🔐",
-    question: "À quelle fréquence changez-vous vos mots de passe critiques ?",
+    question: "Que faites-vous si un mot de passe important est compromis ou exposé ?",
     options: [
-      { label: "Je reçois des alertes de compromission et je change immédiatement", value: 3 },
-      { label: "Jamais, sauf si on me force", value: 0 },
-      { label: "Tous les 3 à 6 mois", value: 2 },
-      { label: "Une fois par an environ", value: 1 },
+      { label: "Je le change immédiatement et vérifie les autres comptes où il aurait été réutilisé", value: 3 },
+      { label: "Je le garde, sauf si le service m'oblige à le changer", value: 0 },
+      { label: "Je le change dès que je reçois une alerte crédible", value: 2 },
+      { label: "J'attends d'avoir plus d'informations avant d'agir", value: 1 },
     ],
   },
   {
@@ -99,7 +99,7 @@ export const quizQuestions: QuizQuestion[] = [
     question: "Savez-vous identifier un site web frauduleux ?",
     options: [
       { label: "Je me fie au cadenas dans la barre d'adresse", value: 1 },
-      { label: "Oui, je vérifie l'URL, le certificat SSL et les indices visuels", value: 3 },
+      { label: "Je vérifie le nom de domaine et passe par une adresse ou un favori officiel", value: 3 },
       { label: "Je fais attention à l'URL principalement", value: 2 },
       { label: "Non, je ne sais pas comment vérifier", value: 0 },
     ],
@@ -177,7 +177,7 @@ export const quizQuestions: QuizQuestion[] = [
       { label: "Oui, les bases sont en place (mentions légales, consentement)", value: 2 },
       { label: "Non, ou je ne sais pas", value: 0 },
       { label: "C'est en cours de mise en place", value: 1 },
-      { label: "Oui, avec DPO, registre de traitements et procédures de notification", value: 3 },
+      { label: "Oui, avec des règles adaptées, les contacts identifiés et les procédures nécessaires", value: 3 },
     ],
   },
   {
@@ -200,7 +200,7 @@ export const quizQuestions: QuizQuestion[] = [
     options: [
       { label: "Suppression standard puis vidage de la corbeille", value: 2 },
       { label: "Je mets à la corbeille sans la vider", value: 1 },
-      { label: "Suppression sécurisée avec écrasement et certificat de destruction", value: 3 },
+      { label: "Je respecte les durées de conservation puis j'utilise la procédure d'effacement adaptée au support", value: 3 },
       { label: "Je ne supprime rien, tout reste stocké", value: 0 },
     ],
   },
@@ -223,7 +223,7 @@ export const quizQuestions: QuizQuestion[] = [
     question: "Savez-vous quoi faire en cas de violation de données (data breach) ?",
     options: [
       { label: "Non, aucune idée de la procédure", value: 0 },
-      { label: "Oui, procédure documentée : notification CNIL sous 72h, plan de communication", value: 3 },
+      { label: "Oui, je connais la procédure et les personnes à prévenir rapidement", value: 3 },
       { label: "J'ai une idée générale et je sais qui contacter", value: 2 },
       { label: "Je préviendrais mon manager", value: 1 },
     ],
@@ -239,7 +239,7 @@ export const quizQuestions: QuizQuestion[] = [
     question: "Vos postes de travail sont-ils protégés par un antivirus/EDR ?",
     options: [
       { label: "Oui, EDR professionnel avec monitoring centralisé", value: 3 },
-      { label: "Antivirus basique (Windows Defender uniquement)", value: 1 },
+      { label: "La protection intégrée est activée, mais je ne sais pas si elle est à jour", value: 1 },
       { label: "Non, pas de protection particulière", value: 0 },
       { label: "Oui, antivirus à jour sur tous les postes", value: 2 },
     ],
@@ -260,12 +260,12 @@ export const quizQuestions: QuizQuestion[] = [
     id: "infra-3",
     theme: "Sécurité des postes & réseaux",
     themeIcon: "💻",
-    question: "Utilisez-vous un VPN pour le travail à distance ?",
+    question: "Comment accédez-vous aux ressources professionnelles à distance ?",
     options: [
-      { label: "Non, je me connecte directement", value: 0 },
-      { label: "Oui, VPN personnel ou d'entreprise", value: 2 },
-      { label: "Oui, VPN d'entreprise obligatoire avec kill switch", value: 3 },
-      { label: "Parfois, quand je suis sur un WiFi public", value: 1 },
+      { label: "Je me connecte directement sans outil prévu par mon organisation", value: 0 },
+      { label: "J'utilise le VPN ou la solution d'accès à distance approuvée", value: 2 },
+      { label: "J'utilise uniquement les outils sécurisés et gérés par mon organisation", value: 3 },
+      { label: "J'utilise parfois un VPN personnel, surtout sur un Wi-Fi public", value: 1 },
     ],
   },
   {
@@ -274,7 +274,7 @@ export const quizQuestions: QuizQuestion[] = [
     themeIcon: "💻",
     question: "Comment sécurisez-vous votre réseau WiFi professionnel ?",
     options: [
-      { label: "WPA3, réseau invité séparé, filtrage MAC, monitoring", value: 3 },
+      { label: "WPA3, réseau invité séparé, administration protégée et équipement à jour", value: 3 },
       { label: "Je ne sais pas quelle sécurité est en place", value: 0 },
       { label: "WPA2 avec mot de passe fort et réseau invité", value: 2 },
       { label: "WPA2 avec un mot de passe simple", value: 1 },

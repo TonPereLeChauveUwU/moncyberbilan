@@ -42,7 +42,14 @@ export interface QuizResult {
   percentage: number;
   level: "critique" | "faible" | "moyen" | "bon" | "excellent";
   themeScores: ThemeScore[];
-  recommendations: string[];
+  recommendations: LearningStep[];
+}
+
+export interface LearningStep {
+  theme: string;
+  title: string;
+  why: string;
+  action: string;
 }
 
 export interface ThemeScore {
