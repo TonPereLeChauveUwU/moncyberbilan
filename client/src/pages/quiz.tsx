@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { Link } from "wouter";
-import { quizQuestions, themes } from "@shared/questions";
+import { themes } from "@shared/questions";
+import { getQuestionsForProfile, learnerProfiles, type ProfileId } from "@shared/profiles";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -20,25 +21,85 @@ export default function Quiz() {
   const [initial] = useState(() => {
     try { return loadQuizSession(sessionStorage); } catch { return emptySession(); }
   });
+  const [profile, setProfile] = useState<ProfileId | null>(initial.profile);
   const [currentIndex, setCurrentIndex] = useState(initial.currentIndex);
   const [answers, setAnswers] = useState<Answers>(initial.answers);
   const [showResults, setShowResults] = useState(initial.showResults);
   const [saved, setSaved] = useState(true);
   const headingRef = useRef<HTMLHeadingElement>(null);
+  const questions = profile ? getQuestionsForProfile(profile) : [];
 
   useEffect(() => {
-    try { setSaved(saveQuizSession(sessionStorage, { answers, currentIndex, showResults })); }
+    try { setSaved(saveQuizSession(sessionStorage, { profile, answers, currentIndex, showResults })); }
     catch { setSaved(false); }
-  }, [answers, currentIndex, showResults]);
-  useEffect(() => { headingRef.current?.focus(); }, [currentIndex, showResults]);
+  }, [profile, answers, currentIndex, showResults]);
+  useEffect(() => { headingRef.current?.focus(); }, [profile, currentIndex, showResults]);
 
-  const question = quizQuestions[currentIndex];
-  const progress = Object.keys(answers).length / quizQuestions.length * 100;
-  const currentThemeIndex = themes.indexOf(question.theme);
-  const result = useMemo(() => showResults ? calculateResult(answers) : null, [showResults, answers]);
+  const question = questions[currentIndex];
+  const progress = profile
+    ? questions.filter((item) => answers[item.id] !== undefined).length / questions.length * 100
+    : 0;
+  const result = useMemo(
+    () => showResults && profile ? calculateResult(answers, profile) : null,
+    [showResults, answers, profile],
+  );
   const resetQuiz = () => {
     setAnswers({}); setCurrentIndex(0); setShowResults(false);
   };
+
+  if (!profile) {
+    return (
+      <div className="quiz-shell min-h-screen">
+        <header className="border-b border-border/50 bg-background/80 backdrop-blur-md">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 h-14 flex items-center">
+            <Button asChild variant="ghost" size="sm" className="gap-1.5 text-xs">
+              <Link href="/"><ArrowLeft className="w-3.5 h-3.5" />Accueil</Link>
+            </Button>
+          </div>
+        </header>
+        <main className="quiz-body mx-auto px-4 sm:px-6 pb-16">
+          <p className="eyebrow">UN BILAN ADAPTÉ À VOTRE QUOTIDIEN</p>
+          <h1 ref={headingRef} tabIndex={-1}>Pour quel contexte souhaitez-vous faire le bilan ?</h1>
+          <p className="text-sm text-muted-foreground mb-6">
+            Les questions et les conseils s’adaptent à votre situation. Vos réponses restent dans cet onglet.
+          </p>
+          <div className="space-y-3">
+            {learnerProfiles.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => {
+                  setAnswers({});
+                  setCurrentIndex(0);
+                  setShowResults(false);
+                  setProfile(item.id);
+                }}
+                className="answer-option w-full text-left border border-border/60 bg-card hover:border-primary/30 hover:bg-card/80"
+              >
+                <span className="answer-letter" aria-hidden="true">→</span>
+                <span><strong className="block">{item.title}</strong><span className="text-sm text-muted-foreground">{item.description}</span></span>
+              </button>
+            ))}
+          </div>
+          {!saved && <p role="status" className="mt-4 text-sm text-muted-foreground">La reprise est indisponible dans ce navigateur.</p>}
+        </main>
+      </div>
+    );
+  }
+
+  if (!question) {
+    return <p role="alert" className="p-8">Le questionnaire n’a pas pu être chargé. Revenez à l’accueil puis recommencez.</p>;
+  }
+
+  const currentThemeIndex = themes.indexOf(question.theme);
+  const changeProfile = () => {
+    if (Object.keys(answers).length > 0 && !window.confirm("Changer de profil effacera vos réponses. Continuer ?")) return;
+    setAnswers({});
+    setCurrentIndex(0);
+    setShowResults(false);
+    setProfile(null);
+  };
+
   // Results view
   if (showResults && result) {
     const cfg = levelConfig[result.level];
@@ -51,11 +112,14 @@ export default function Quiz() {
                 Accueil
               </Link></Button>
             <div className="flex-1" />
-            <span className="text-xs text-muted-foreground">Résultats</span>
+            <Button variant="ghost" size="sm" className="text-xs" onClick={changeProfile}>Changer de profil</Button>
           </div>
         </header>
 
         <div className="results-body mx-auto px-4 sm:px-6">
+          <p className="text-xs text-muted-foreground mb-4">
+            {learnerProfiles.find((item) => item.id === profile)?.title} · {questions.length} questions
+          </p>
           {/* Score card */}
           <Card className={`score-card border ${cfg.border} mb-6`}>
             <CardContent className="p-6 text-center">
@@ -92,18 +156,22 @@ export default function Quiz() {
             })}
           </div>
 
-          {/* Recommendations */}
-          <h2 className="text-sm font-semibold mb-3">Recommandations</h2>
-          <Card className="border border-border/60 mb-6">
-            <CardContent className="p-4 space-y-2">
-              {result.recommendations.map((r, i) => (
-                <div key={i} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                  <span className="text-muted-foreground">{r}</span>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
+          <h2 className="text-sm font-semibold mb-3">Votre mini-parcours de progression</h2>
+          <div className="space-y-3 mb-6">
+            {result.recommendations.map((step, index) => (
+              <Card key={`${step.theme}-${step.title}`} className="border border-border/60">
+                <CardContent className="p-4">
+                  <div className="flex items-center gap-2 text-xs text-primary mb-2">
+                    <CheckCircle2 className="w-4 h-4 shrink-0" />
+                    <span>Étape {index + 1} · {step.theme}</span>
+                  </div>
+                  <h3 className="font-semibold mb-1">{step.title}</h3>
+                  <p className="text-sm text-muted-foreground mb-3">{step.why}</p>
+                  <p className="text-sm"><strong>À faire :</strong> {step.action}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
 
           <p className="text-sm text-muted-foreground">
             Votre bilan est disponible ici, sans fournir d'adresse email. Vos réponses restent dans cet onglet.
@@ -142,9 +210,7 @@ export default function Quiz() {
           <div className="flex-1">
             <Progress value={progress} aria-label="Questions répondues" className="h-1.5" />
           </div>
-          <span className="text-xs text-muted-foreground tabular-nums">
-            {currentIndex + 1}/{quizQuestions.length}
-          </span>
+          <span className="text-xs text-muted-foreground tabular-nums">{currentIndex + 1}/{questions.length}</span>
         </div>
       </header>
 
@@ -200,9 +266,9 @@ export default function Quiz() {
             Précédent
           </Button>
           <Button size="sm" disabled={answers[question.id] === undefined}
-            onClick={() => currentIndex < quizQuestions.length - 1 ? setCurrentIndex(currentIndex + 1) : setShowResults(true)}
+            onClick={() => currentIndex < questions.length - 1 ? setCurrentIndex(currentIndex + 1) : setShowResults(true)}
             className="text-xs gap-1" data-testid="button-next">
-            {currentIndex < quizQuestions.length - 1 ? "Suivant" : "Voir mon bilan"}
+            {currentIndex < questions.length - 1 ? "Suivant" : "Voir mon bilan"}
             <ArrowRight className="w-3.5 h-3.5" />
           </Button>
         </div>
